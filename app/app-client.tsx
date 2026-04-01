@@ -1,4 +1,5 @@
 'use client'
+import { Providers } from './providers'
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { useAccount, useWriteContract, useReadContract } from 'wagmi'
@@ -231,6 +232,7 @@ export default function AppClient() {
   const currentLabel = [...navItems, { id: 'profile', label: 'Profile', icon: '👤' }].find(n => n.id === page)?.label || 'Dashboard'
 
   return (
+    <Providers>
     <div style={{ display: 'flex', minHeight: '100vh', background: T.bg, color: T.text, fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
 
       {/* ── SIDEBAR ── */}
@@ -845,5 +847,6 @@ export default function AppClient() {
         </main>
       </div>
     </div>
+    </Providers>
   )
 }
