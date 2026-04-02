@@ -8,6 +8,7 @@ import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { config } from './wagmi'
 import '@rainbow-me/rainbowkit/styles.css'
+import { BattleModal } from './battle-modal'
 
 const MASTER_ABI = [
   { name: 'createHero', type: 'function', stateMutability: 'nonpayable', inputs: [{ name: '_name', type: 'string' }], outputs: [] },
@@ -162,6 +163,8 @@ function Game() {
   const [manualCode, setManualCode] = useState('')
   const [battleStory, setBattleStory] = useState('')
   const [localResult, setLocalResult] = useState<{won:boolean,xp:number}|null>(null)
+  const [showBattleModal, setShowBattleModal] = useState(false)
+  const [battleModalData, setBattleModalData] = useState<{monsterName:string,monsterEmoji:string,won:boolean,xp:number}|null>(null)
   const [pUsername, setPUsername] = useState('')
   const [pX, setPX] = useState('')
   const [pFarcaster, setPFarcaster] = useState('')
@@ -211,6 +214,8 @@ function Game() {
     const stories = won ? winStories : loseStories
     setBattleStory(stories[Math.floor(Math.random() * stories.length)](name, monster.name))
     setLocalResult({ won, xp: won ? monster.xp : 0 })
+    setBattleModalData({ monsterName: monster.name, monsterEmoji: monster.emoji, won, xp: won ? monster.xp : 0 })
+    setShowBattleModal(true)
     writeContract({ address: MASTER as any, abi: MASTER_ABI, functionName: 'battle', args: [BigInt(selectedMonster)] }, {
       onSuccess: () => { setTimeout(() => { refetchHero(); refetchXP(); refetchProgress(); refetchQuests() }, 2000); setMsg('Battle complete! XP updated ✅') }
     })
@@ -754,6 +759,17 @@ function Game() {
           )}
         </main>
       </div>
+    {showBattleModal && battleModalData && heroData && (
+      <BattleModal
+        heroName={heroData.name}
+        monsterName={battleModalData.monsterName}
+        monsterEmoji={battleModalData.monsterEmoji}
+        heroEmoji={myProfile?.exists ? myProfile.avatarEmoji : '⚔️'}
+        won={battleModalData.won}
+        xp={battleModalData.xp}
+        onClose={() => setShowBattleModal(false)}
+      />
+    )}
     </div>
   )
 }
